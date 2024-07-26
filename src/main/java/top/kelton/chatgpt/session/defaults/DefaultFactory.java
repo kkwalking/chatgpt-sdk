@@ -5,7 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import top.kelton.chatgpt.client.OpenAiService;
+import top.kelton.chatgpt.client.OpenAiClient;
 import top.kelton.chatgpt.interceptor.HttpInterceptor;
 import top.kelton.chatgpt.session.Configuration;
 import top.kelton.chatgpt.session.Factory;
@@ -55,7 +55,7 @@ public class DefaultFactory implements Factory {
                 .build();
 
         // 创建服务
-        configuration.setOpenAiService(retrofit.create(OpenAiService.class));
+        configuration.setOpenAiClient(retrofit.create(OpenAiClient.class));
         return new DefaultOpenAiSession(configuration);
     }
 }

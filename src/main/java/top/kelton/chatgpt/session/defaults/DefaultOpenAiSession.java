@@ -1,20 +1,16 @@
 package top.kelton.chatgpt.session.defaults;
 
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
+import com.google.gson.Gson;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.sse.EventSource;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import top.kelton.chatgpt.client.OpenAiService;
+import okhttp3.sse.EventSourceListener;
+import top.kelton.chatgpt.client.OpenAiClient;
 import top.kelton.chatgpt.domain.ChatCompletionRequest;
 import top.kelton.chatgpt.domain.ChatCompletionResponse;
-import top.kelton.chatgpt.interceptor.HttpInterceptor;
 import top.kelton.chatgpt.session.Configuration;
 import top.kelton.chatgpt.session.OpenAiSession;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author zzk
@@ -23,9 +19,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultOpenAiSession implements OpenAiSession {
 
+    final static String NULL = "NULL";
+
     private Configuration configuration;
 
-    private OpenAiService openAiService;
+    private OpenAiClient openAiClient;
 
     private EventSource.Factory factory;
 
@@ -33,7 +31,7 @@ public class DefaultOpenAiSession implements OpenAiSession {
     public DefaultOpenAiSession(Configuration configuration) {
 
         this.configuration = configuration;
-        this.openAiService = configuration.getOpenAiService();
+        this.openAiClient = configuration.getOpenAiClient();
         this.factory = configuration.createEventSourceFactory();
     }
 
@@ -46,6 +44,29 @@ public class DefaultOpenAiSession implements OpenAiSession {
      */
     @Override
     public ChatCompletionResponse completions(ChatCompletionRequest question) throws Exception {
-        return openAiService.createChatCompletion(question).execute().body();
+        return openAiClient.chatCompletions(question).execute().body();
+    }
+
+    @Override
+    public EventSource completions(ChatCompletionRequest question, EventSourceListener eventSourceListener) {
+        return completions(NULL, NULL, question, eventSourceListener);
+
+    }
+
+    @Override
+    public EventSource completions(String apiHost, String apiKey, ChatCompletionRequest question, EventSourceListener eventSourceListener) {
+        if (!question.isStream()) {
+            throw new RuntimeException("illegal parameter: stream is false!");
+        }
+        apiHost = NULL.equals(apiHost) ? configuration.getApiHost() : apiHost;
+        apiKey = NULL.equals(apiKey) ? configuration.getApiKey() : apiKey;
+        // 构建请求信息
+        Request request = new Request.Builder()
+                .url(apiHost.concat(OpenAiClient.V1_COMPLETIONS))
+                .header("apiKey", apiKey)
+                .post(RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(question)))
+                .build();
+        // 返回事件结果
+        return factory.newEventSource(request, eventSourceListener);
     }
 }

@@ -1,13 +1,11 @@
 package top.kelton.chatgpt.session;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
-import top.kelton.chatgpt.client.OpenAiService;
+import top.kelton.chatgpt.client.OpenAiClient;
 
 /**
  * @author zzk
@@ -23,7 +21,7 @@ public class Configuration {
 
     private String apiKey;
 
-    private OpenAiService openAiService;
+    private OpenAiClient openAiClient;
 
     private OkHttpClient okHttpClient;
 

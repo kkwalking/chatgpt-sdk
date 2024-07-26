@@ -24,6 +24,8 @@ public class ChatCompletionRequest {
      */
     private List<Message> messages;
 
+    private boolean stream;
+
     /**
      *  消息类
      */
