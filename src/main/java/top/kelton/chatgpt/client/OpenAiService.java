@@ -1,4 +1,4 @@
-package top.kelton.chatgpt;
+package top.kelton.chatgpt.client;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -8,10 +8,6 @@ import top.kelton.chatgpt.domain.ChatCompletionRequest;
 import top.kelton.chatgpt.domain.ChatCompletionResponse;
 
 public interface OpenAiService {
-    @Headers({
-        "Content-Type: application/json"
-
-    })
     @POST("v1/chat/completions")
     Call<ChatCompletionResponse> createChatCompletion(@Body ChatCompletionRequest body);
 }

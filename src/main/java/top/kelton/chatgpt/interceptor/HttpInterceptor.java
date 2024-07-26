@@ -6,13 +6,13 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
-public class OpenAiInterceptor implements Interceptor {
+public class HttpInterceptor implements Interceptor {
 
     /** OpenAi apiKey */
-    private final String apiKeyBySystem;
+    private final String apiKeyDefault;
 
-    public OpenAiInterceptor(String apiKeyBySystem) {
-        this.apiKeyBySystem = apiKeyBySystem;
+    public HttpInterceptor(String apiKeyDefault) {
+        this.apiKeyDefault = apiKeyDefault;
     }
 
     @Override
@@ -20,9 +20,9 @@ public class OpenAiInterceptor implements Interceptor {
         // 1. 获取原始 Request
         Request original = chain.request();
 
-        // 2. 读取 apiKey；优先使用自己传递的 apiKey
+        // 2. 读取 apiKey；优先使用传递的 apiKey
         String apiKeyByUser = original.header("apiKey");
-        String apiKey = null == apiKeyByUser ? apiKeyBySystem : apiKeyByUser;
+        String apiKey = null == apiKeyByUser ? apiKeyDefault : apiKeyByUser;
 
         // 3. 构建 Request
         Request request = original.newBuilder()
